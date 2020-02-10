@@ -72,4 +72,47 @@
       host: localhost        
       priv: "{{mysql_db}}.*:ALL,GRANT"        
       login_unix_socket: /var/run/mysqld/mysqld.sock
+- name: PHPMYADMIN Installation  
+  hosts: all  
+  tasks: 
+     - name: Installation de debconf-utils
+       apt:        
+        name: debconf-utils
+        state: present
+     - name: Installation de dbconfig      
+       debconf:         
+        name: phpmyadmin         
+        question: phpmyadmin/dbconfig-install         
+        value: true         
+        vtype: boolean       
+        question: phpmyadmin/app-password-confirm      
+        value: btsinfo         
+        vtype: password 
+        question: phpmyadmin/mysql/admin-pass     
+        value: btsinfo         
+        vtype: password  
+        question: phpmyadmin/mysql/app-pass    
+        value: btsinfo         
+        vtype: password 
+        question: phpmyadmin/reconfigure-webserver    
+        value: apache2         
+        vtype: multiselect
+     - name: Installation de e PhpMyAdmin
+       apt:        
+        name: phpmyadmin
+        state: present
+- name: Gestion des erreurs  
+  hosts: all  
+  tasks:
+   - name: Suppression index.html      
+     file:         
+      path: /var/www/html/index.html        
+      state: absent   
+   - name: Gestion du copie     
+     copy:        
+      src: /root/index.php  
+      dest: /var/www/html         
+      owner: www-data        
+      group: www-data        
+      mode: 0755 
          
